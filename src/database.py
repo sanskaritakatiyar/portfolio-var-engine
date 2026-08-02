@@ -11,7 +11,7 @@ def build_database(tickers, db_path='data/portfolio.db'):
     
     for ticker in tickers:
         print(f"Downloading {ticker}...")
-        df = yf.download(ticker, period='5y', auto_adjust=True)['Close']
+        df = yf.download(ticker, start='2007-01-01', auto_adjust=True)['Close']
         df = df.reset_index()
         df.columns = ['date', 'close']
         df['ticker'] = ticker
