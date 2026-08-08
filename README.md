@@ -10,6 +10,7 @@ A deployable portfolio risk management tool built in Python, with a live interac
 - Runs stress tests against 4 historical crisis scenarios: GFC 2008, COVID crash, Russia-Ukraine 2022, Tech Selloff 2022
 - Shows asset correlation heatmap and cumulative portfolio returns
 - Built on 18 years of real market data stored in a SQLite database
+- In this project, I use 95% confidence and 1-day horizon, which are the most common defaults in practice 
 
 ## Sample results (equal-weighted AAPL, MSFT, GOOGL, JPM, GS)
 Historical VaR  : -2.35%
