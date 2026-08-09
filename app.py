@@ -28,13 +28,24 @@ if len(selected) < 2:
     st.warning("Please select at least 2 assets.")
     st.stop()
 
-# Equal weights by default
-weights = np.array([1/len(selected)] * len(selected))
+st.sidebar.write("Set portfolio weights:")
+raw_weights = []
+for ticker in selected:
+    w = st.sidebar.slider(f"{ticker} weight", 0, 100, 100 // len(selected), key=ticker)
+    raw_weights.append(w)
 
-st.sidebar.write("Weights (equal weighted):")
+raw_weights = np.array(raw_weights)
+
+if raw_weights.sum() == 0:
+    st.sidebar.warning("At least one weight must be greater than 0.")
+    st.stop()
+
+weights = raw_weights / raw_weights.sum()
+
+st.sidebar.write("Normalized weights:")
 for t, w in zip(selected, weights):
     st.sidebar.write(f"  {t}: {w:.1%}")
-
+    
 # Load data
 returns_df = load_returns(selected, db_path='data/portfolio.db')
 portfolio_returns = returns_df.dot(weights)
