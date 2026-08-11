@@ -92,6 +92,24 @@ for scenario, result in stress_results.items():
 
 if stress_data:
     st.dataframe(pd.DataFrame(stress_data), use_container_width=True)
+if stress_data:
+    stress_df = pd.DataFrame(stress_data)
+    stress_df['loss_value'] = stress_df['Total Loss'].str.replace('%', '').astype(float)
+    
+    fig_stress = go.Figure()
+    fig_stress.add_trace(go.Bar(
+        x=stress_df['Scenario'],
+        y=stress_df['loss_value'],
+        marker_color='indianred',
+        text=stress_df['Total Loss'],
+        textposition='outside'
+    ))
+    fig_stress.update_layout(
+        title="Total Loss by Stress Scenario",
+        yaxis_title="Total Loss (%)",
+        height=400
+    )
+    st.plotly_chart(fig_stress, use_container_width=True)
 
 # Correlation heatmap
 st.header("Asset Correlation Matrix")
