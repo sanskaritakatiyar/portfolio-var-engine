@@ -10,6 +10,7 @@ import plotly.express as px
 from database import load_returns
 from var_engine import historical_var, parametric_var, monte_carlo_var, expected_shortfall
 from stress_test import run_stress_tests
+from optimizer import generate_random_portfolios, find_min_variance_portfolio
 
 st.set_page_config(page_title="Portfolio VaR Engine", layout="wide")
 st.title("Portfolio VaR Engine")
@@ -129,3 +130,38 @@ fig_cum.add_trace(go.Scatter(x=cum_returns.index, y=cum_returns.values,
 fig_cum.update_layout(xaxis_title="Date", yaxis_title="Growth of $1",
                        height=400)
 st.plotly_chart(fig_cum, use_container_width=True)
+
+# Efficient frontier
+st.header("Efficient Frontier — Portfolio Optimization")
+st.caption("Randomly generated portfolio combinations showing the risk-return tradeoff")
+
+with st.spinner("Generating portfolios..."):
+    portfolios = generate_random_portfolios(returns_df, n_portfolios=1000)
+    best = find_min_variance_portfolio(portfolios)
+
+frontier_returns = [p['return'] for p in portfolios]
+frontier_vols = [p['volatility'] for p in portfolios]
+
+fig_frontier = go.Figure()
+fig_frontier.add_trace(go.Scatter(
+    x=frontier_vols, y=frontier_returns, mode='markers',
+    marker=dict(size=5, color=frontier_returns, colorscale='Viridis', 
+                showscale=True, colorbar=dict(title="Return")),
+    name='Random portfolios'
+))
+fig_frontier.add_trace(go.Scatter(
+    x=[best['volatility']], y=[best['return']],
+    mode='markers', marker=dict(size=15, color='red', symbol='star'),
+    name='Min variance portfolio'
+))
+fig_frontier.update_layout(
+    xaxis_title='Annual Volatility (Risk)',
+    yaxis_title='Annual Expected Return',
+    height=500
+)
+st.plotly_chart(fig_frontier, use_container_width=True)
+
+st.subheader("Minimum Variance Portfolio Weights")
+min_var_cols = st.columns(len(selected))
+for i, ticker in enumerate(selected):
+    min_var_cols[i].metric(ticker, f"{best['weights'][i]*100:.1f}%")
